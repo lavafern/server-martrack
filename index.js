@@ -6,7 +6,7 @@ const data = []
 receiverSocket.onmessage = async function (event) {
     let aisMessage = JSON.parse(event.data)
     const shipData = aisMessage.MetaData
-    // console.log('AISMESSAGE: ',MMSI)
+    // console.log('AISMESSAGE: ',shipData)
     data.push(shipData)
 }
 
@@ -30,5 +30,4 @@ io.on('connection', client => {
     client.on('disconnect', () => { console.log('disconected!!!!');});
 });
 
-
-server.listen(3000);
+server.listen(3000, () => console.log('server listening to port 3000'));
