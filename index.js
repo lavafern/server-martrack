@@ -1,6 +1,7 @@
 require('dotenv').config()
 const receiverSocket = require('./receiver')
-const {server,io} = require('./emitter')
+const {server,io,app} = require('./emitter')
+const vesselRoutes = require('./routes/vessel.routes')
 const data = []
 
 receiverSocket.onmessage = async function (event) {
@@ -29,5 +30,7 @@ io.on('connection', client => {
 
     client.on('disconnect', () => { console.log('disconected!!!!');});
 });
+
+app.use('/vessel',vesselRoutes)
 
 server.listen(3000, () => console.log('server listening to port 3000'));
