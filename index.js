@@ -1,14 +1,30 @@
 require('dotenv').config()
 const receiverSocket = require('./receiver')
-const {server,io} = require('./emitter')
+const {server,io,app} = require('./emitter')
+const vesselRoutes = require('./routes/vessel.routes')
+const {  upsert } = require('./services/vessel.service')
+const corsMiddleware = require('./middlewares/cors.middleware')
 const data = []
+let dataInsert
+
 
 receiverSocket.onmessage = async function (event) {
     let aisMessage = JSON.parse(event.data)
     const shipData = aisMessage.MetaData
-    // console.log('AISMESSAGE: ',MMSI)
+    console.log('AISMESSAGE: ',shipData)
     data.push(shipData)
+    dataInsert = {
+        mmsi: String(shipData.MMSI),
+        name: shipData.ShipName,
+        lat:shipData.latitude,
+        long: shipData.longitude,
+        time_utc:new Date(shipData.time_utc).toISOString()
+    }
 }
+
+setInterval(() => {
+    if (dataInsert) upsert(dataInsert)
+}, 10000);
 
 io.on('connection', client => {
     console.log('conntected',client);
@@ -30,5 +46,7 @@ io.on('connection', client => {
     client.on('disconnect', () => { console.log('disconected!!!!');});
 });
 
+app.use(corsMiddleware)
+app.use(vesselRoutes)
 
-server.listen(3000);
+server.listen(3000, () => console.log('server listening to port 3000'));
