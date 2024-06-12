@@ -1,8 +1,7 @@
+const { getAll } = require('../controllers/vessel.controller')
+
 const router = require('express').Router()
 
-
-router.get('/hello',(req,res,next) => {
-    res.send('heloo')
-})
+router.get('/vessel',getAll)
 
 module.exports = router
